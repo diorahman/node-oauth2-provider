@@ -149,11 +149,11 @@ OAuth2Provider.prototype.oauth = function() {
       var url = redirect_uri;
 
       switch(response_type) {
-        case 'code': url += '?'; break;
+        //case 'code': url += '?'; break;
         case 'token': url += '#'; break;
         default:
           res.writeHead(400);
-          return res.end('invalid response_type requested');
+          return res.end(JSON.stringify({status : 'error', message : 'invalid response_type requested'}, null, 4));
       }
 
       if('allow' in req.body) {
@@ -200,9 +200,9 @@ OAuth2Provider.prototype.oauth = function() {
         }
       } else {
         url += querystring.stringify({error: 'access_denied'});
-
-        res.writeHead(303, {Location: url});
-        res.end();
+        self.emit('access_denied', url, req, res)
+        //res.writeHead(303, {Location: url});
+        //res.end();
       }
 
     } else if(req.method == 'POST' && self.options.access_token_uri == uri) {
@@ -277,4 +277,5 @@ OAuth2Provider.prototype._createAccessToken = function(user_id, client_id, cb) {
   });
 };
 
+console.log('forked-version')
 exports.OAuth2Provider = OAuth2Provider;
